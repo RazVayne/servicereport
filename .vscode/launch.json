@@ -5,23 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "servicereport",
-            "cwd": "servicereport",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
             "name": "servicereport (profile mode)",
             "cwd": "servicereport",
             "request": "launch",
             "type": "dart",
+            "args": [
+                "--flavor",
+                "profiling"
+            ],
             "flutterMode": "profile"
         },
         {
-            "name": "servicereport (release mode)",
+            "name": "servicereport (staging)",
             "cwd": "servicereport",
             "request": "launch",
             "type": "dart",
+            "args": [
+                "--flavor",
+                "staging"
+            ],
+        },
+        {
+            "name": "servicereport (production)",
+            "cwd": "servicereport",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "production"
+            ],
             "flutterMode": "release"
         }
     ]
