@@ -13,25 +13,29 @@ class SignalGoogleSignIn {
       "401661839059-mhvhvh06t2cuu7qik8ocpm2n1fp2fdtr.apps.googleusercontent.com";
   List<String> scopes = <String>['https://www.googleapis.com/auth/drive.file'];
 
-  final _currentUser = signal<GoogleSignInAccount?>(null);
-  final _isAuthorized = signal(false);
-  final _errorMessage = signal('');
-  final _serverAuthCode = signal('');
+  final currentUser = signal<GoogleSignInAccount?>(null);
+  final isAuthorized = signal(false);
+  final errorMessage = signal('');
+  final serverAuthCode = signal('');
+  bool _isInitialized = false;
 
   void initGoogleSignIn() {
     final GoogleSignIn signIn = GoogleSignIn.instance;
-    unawaited(
-      signIn
-          .initialize(
-            clientId: kIsWeb ? webCliendId : androidClientId,
-            serverClientId: webServerCliendId,
-          )
-          .then((value) {
-            signIn.authenticationEvents
-                .listen(handleAuthenticationEvent)
-                .onError(handleAuthenticationError);
-          }),
-    );
+    if (!_isInitialized) {
+      unawaited(
+        signIn
+            .initialize(
+              clientId: kIsWeb ? webCliendId : androidClientId,
+              serverClientId: kIsWeb ? null : webServerCliendId,
+            )
+            .then((value) {
+              signIn.authenticationEvents
+                  .listen(handleAuthenticationEvent)
+                  .onError(handleAuthenticationError);
+              _isInitialized = true;
+            }),
+      );
+    }
   }
 
   Future<void> handleAuthenticationEvent(
@@ -46,17 +50,17 @@ class SignalGoogleSignIn {
         ?.authorizationClient
         .authorizationForScopes(scopes);
 
-    _currentUser.value = user;
-    _isAuthorized.value = authorization != null;
-    _errorMessage.value = '';
+    currentUser.value = user;
+    isAuthorized.value = authorization != null;
+    errorMessage.value = '';
 
     //TODO: Call APIs to get contact ICON and NAME
   }
 
   Future<void> handleAuthenticationError(Object e) async {
-    _currentUser.value = null;
-    _isAuthorized.value = false;
-    _errorMessage.value = e is GoogleSignInException
+    currentUser.value = null;
+    isAuthorized.value = false;
+    errorMessage.value = e is GoogleSignInException
         ? _errorMessageFromSignInException(e)
         : "Unknown exception: $e";
   }
@@ -67,13 +71,31 @@ class SignalGoogleSignIn {
           .authorizationClient
           .authorizeScopes(scopes);
       authorization;
-      _isAuthorized.value = true;
-      _errorMessage.value = '';
+      isAuthorized.value = true;
+      errorMessage.value = '';
 
       //TODO: Get JSON files from Drive
     } on GoogleSignInException catch (e) {
-      _errorMessage.value = _errorMessageFromSignInException(e);
+      errorMessage.value = _errorMessageFromSignInException(e);
     }
+  }
+
+  Future<void> _handleGetAuthCode(GoogleSignInAccount user) async {
+    try {
+      final GoogleSignInServerAuthorization? serverAuth = await user
+          .authorizationClient
+          .authorizeServer(scopes);
+
+      serverAuthCode.value = serverAuth == null
+          ? ''
+          : serverAuth.serverAuthCode;
+    } on GoogleSignInException catch (e) {
+      errorMessage.value = _errorMessageFromSignInException(e);
+    }
+  }
+
+  Future<void> _handleSignOut() async {
+    await GoogleSignIn.instance.signOut();
   }
 
   String _errorMessageFromSignInException(GoogleSignInException e) {

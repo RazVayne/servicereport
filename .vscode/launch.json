@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "servicereport (staging)",
+            "cwd": "servicereport",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "staging"
+            ],
+        },
+        {
             "name": "servicereport (profile mode)",
             "cwd": "servicereport",
             "request": "launch",
@@ -14,16 +24,6 @@
                 "profiling"
             ],
             "flutterMode": "profile"
-        },
-        {
-            "name": "servicereport (staging)",
-            "cwd": "servicereport",
-            "request": "launch",
-            "type": "dart",
-            "args": [
-                "--flavor",
-                "staging"
-            ],
         },
         {
             "name": "servicereport (production)",
