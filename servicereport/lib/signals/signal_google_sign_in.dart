@@ -17,28 +17,26 @@ class SignalGoogleSignIn {
   final isAuthorized = signal(false);
   final errorMessage = signal('');
   final serverAuthCode = signal('');
+  final GoogleSignIn signIn = GoogleSignIn.instance;
   bool _isInitialized = false;
 
-  void initGoogleSignIn() {
-    final GoogleSignIn signIn = GoogleSignIn.instance;
+  void initGoogleSignIn() async {
+    _isInitialized = true;
     if (!_isInitialized) {
-      unawaited(
-        signIn
-            .initialize(
-              clientId: kIsWeb ? webCliendId : androidClientId,
-              serverClientId: kIsWeb ? null : webServerCliendId,
-            )
-            .then((value) {
-              signIn.authenticationEvents
-                  .listen(handleAuthenticationEvent)
-                  .onError(handleAuthenticationError);
-              _isInitialized = true;
-            }),
-      );
+      await signIn
+          .initialize(
+            clientId: kIsWeb ? webCliendId : androidClientId,
+            serverClientId: kIsWeb ? null : webServerCliendId,
+          )
+          .then((value) {
+            signIn.authenticationEvents
+                .listen(_handleAuthenticationEvent)
+                .onError(_handleAuthenticationError);
+          });
     }
   }
 
-  Future<void> handleAuthenticationEvent(
+  Future<void> _handleAuthenticationEvent(
     GoogleSignInAuthenticationEvent event,
   ) async {
     final GoogleSignInAccount? user = switch (event) {
@@ -57,7 +55,7 @@ class SignalGoogleSignIn {
     //TODO: Call APIs to get contact ICON and NAME
   }
 
-  Future<void> handleAuthenticationError(Object e) async {
+  Future<void> _handleAuthenticationError(Object e) async {
     currentUser.value = null;
     isAuthorized.value = false;
     errorMessage.value = e is GoogleSignInException
@@ -80,7 +78,7 @@ class SignalGoogleSignIn {
     }
   }
 
-  Future<void> _handleGetAuthCode(GoogleSignInAccount user) async {
+  Future<void> handleGetAuthCode(GoogleSignInAccount user) async {
     try {
       final GoogleSignInServerAuthorization? serverAuth = await user
           .authorizationClient
@@ -94,7 +92,7 @@ class SignalGoogleSignIn {
     }
   }
 
-  Future<void> _handleSignOut() async {
+  Future<void> handleSignOut() async {
     await GoogleSignIn.instance.signOut();
   }
 
@@ -109,7 +107,6 @@ class SignalGoogleSignIn {
       GoogleSignInExceptionCode.uiUnavailable => 'UI unavailable',
       GoogleSignInExceptionCode.unknownError => 'Unknown error $e',
       GoogleSignInExceptionCode.userMismatch => 'User mismatch',
-      _ => 'GoogleSignInException ${e.code}: ${e.description}',
     };
   }
 }
