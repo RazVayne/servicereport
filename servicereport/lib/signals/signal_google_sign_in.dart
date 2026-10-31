@@ -20,21 +20,25 @@ class SignalGoogleSignIn {
   final GoogleSignIn signIn = GoogleSignIn.instance;
   bool _isInitialized = false;
 
-  void initGoogleSignIn() async {
-    _isInitialized = true;
+  //TODO: Add connectivity checks, test Android flow
+  late final initGoogleSignIn = futureSignal<bool>(() async {
     if (!_isInitialized) {
+      _isInitialized = true;
       await signIn
           .initialize(
             clientId: kIsWeb ? webCliendId : androidClientId,
             serverClientId: kIsWeb ? null : webServerCliendId,
           )
-          .then((value) {
+          .then((value) async {
             signIn.authenticationEvents
                 .listen(_handleAuthenticationEvent)
                 .onError(_handleAuthenticationError);
+            await signIn.attemptLightweightAuthentication();
           });
     }
-  }
+
+    return _isInitialized;
+  });
 
   Future<void> _handleAuthenticationEvent(
     GoogleSignInAuthenticationEvent event,
@@ -51,8 +55,6 @@ class SignalGoogleSignIn {
     currentUser.value = user;
     isAuthorized.value = authorization != null;
     errorMessage.value = '';
-
-    //TODO: Call APIs to get contact ICON and NAME
   }
 
   Future<void> _handleAuthenticationError(Object e) async {

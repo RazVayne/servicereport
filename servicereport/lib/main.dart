@@ -3,9 +3,14 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:servicereport/signals/signal_google_sign_in.dart';
+import 'package:servicereport/ui/permanent/ui_perm_bottom_nav_bar.dart';
 import 'package:servicereport/ui/routes/ui_route_home.dart';
 
-void main() {
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+final signalGoogleSignIn = SignalGoogleSignIn();
+
+Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   //FLUTTER NATIVE SPLASH
@@ -21,7 +26,26 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      routes: [GoRoute(path: '/', builder: (context, state) => UiRouteHome())],
+      navigatorKey: rootNavigatorKey,
+      routes: [
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return FScaffold(
+              footer: UiPermBottomNavBar(
+                statefulNavigationShell: navigationShell,
+              ),
+              child: navigationShell,
+            );
+          },
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(path: '/', builder: (context, state) => UiRouteHome()),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
 
     final (lightTheme, darkTheme) =

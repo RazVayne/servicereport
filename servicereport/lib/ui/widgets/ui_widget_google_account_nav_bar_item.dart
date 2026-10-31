@@ -12,7 +12,11 @@ class UiWidgetGoogleAccountNavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FBottomNavigationBarItem(
-      icon: GoogleUserCircleAvatar(identity: googleIdentity),
+      icon: GoogleUserCircleAvatar(
+        identity: googleIdentity,
+        placeholderPhotoUrl:
+            "https://lh3.googleusercontent.com/a/ACg8ocJESfXD-V2gobGtSM8sRUCn6RpZ8Y7ZeE0EJXMw4zAorx4IXUDb=c-s40",
+      ),
       label: Text(googleIdentity.displayName ?? ''),
     );
   }

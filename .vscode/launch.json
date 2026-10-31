@@ -11,7 +11,9 @@
             "type": "dart",
             "args": [
                 "--flavor",
-                "staging"
+                "staging",
+                "--web-port",
+                "8080"
             ],
         },
         {

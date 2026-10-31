@@ -6,55 +6,81 @@ import 'package:google_sign_in_platform_interface/google_sign_in_platform_interf
 import 'package:google_sign_in_web/google_sign_in_web.dart' as web;
 
 class UiWidgetNoAccountNavBarItem extends StatelessWidget {
-  const UiWidgetNoAccountNavBarItem({super.key});
+  final String errorMessage;
+  const UiWidgetNoAccountNavBarItem({super.key, required this.errorMessage});
 
   @override
   Widget build(BuildContext context) {
-    return switch (GoogleSignIn.instance.supportsAuthenticate()) {
-      true => FBottomNavigationBarItem(
-        icon: Icon(FLucideIcons.user),
-        label: Text("Sign-in"),
-      ),
-      false =>
-        kIsWeb
-            ? FBottomNavigationBarItem(
-                icon: FButton.icon(
-                  onPress: () => showFSheet(
-                    context: context,
-                    builder: (context) => Center(
-                      child: SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: FCard(
-                          child: Center(
-                            child:
-                                (GoogleSignInPlatform.instance
-                                        as web.GoogleSignInPlugin)
-                                    .renderButton(
-                                      configuration: web.GSIButtonConfiguration(
-                                        type: web
-                                            .GSIButtonType
-                                            .standard, // or icon
-                                        theme: web.GSIButtonTheme.outline,
-                                        size: web.GSIButtonSize.large,
-                                        text: web.GSIButtonText.signinWith,
-                                        shape: web.GSIButtonShape.rectangular,
-                                      ),
-                                    ),
+    return FBottomNavigationBarItem(
+      icon: FButton.icon(
+        child: Column(children: [Icon(FLucideIcons.user), Text('Sign-in')]),
+        onPress: () => showFSheet(
+          context: context,
+          builder: (context) => Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: 75,
+              width: 250,
+              child: FCard(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: switch (GoogleSignIn.instance
+                            .supportsAuthenticate()) {
+                          true => FButton.icon(
+                            onPress: () {},
+                            child: Column(
+                              children: [
+                                Icon(FLucideIcons.user),
+                                Text("Sign-in"),
+                              ],
+                            ),
                           ),
-                        ),
+                          false =>
+                            kIsWeb
+                                ? (GoogleSignInPlatform.instance
+                                          as web.GoogleSignInPlugin)
+                                      .renderButton(
+                                        configuration:
+                                            web.GSIButtonConfiguration(
+                                              type: web
+                                                  .GSIButtonType
+                                                  .standard, // or icon
+                                              theme: web.GSIButtonTheme.outline,
+                                              size: web.GSIButtonSize.large,
+                                              text:
+                                                  web.GSIButtonText.signinWith,
+                                              shape: web
+                                                  .GSIButtonShape
+                                                  .rectangular,
+                                            ),
+                                      )
+                                : FButton.icon(
+                                    onPress: () {},
+                                    child: Column(
+                                      children: [
+                                        const Icon(FLucideIcons.userX),
+                                        const Text("No sign-in options"),
+                                      ],
+                                    ),
+                                  ),
+                        },
                       ),
                     ),
-                    side: .ttb,
-                  ),
-                  child: Icon(FLucideIcons.user),
+                    errorMessage.isEmpty
+                        ? SizedBox.shrink()
+                        : Text(errorMessage),
+                  ],
                 ),
-                label: const Text("Sign-in with Google"),
-              )
-            : FBottomNavigationBarItem(
-                icon: const Icon(FLucideIcons.userX),
-                label: const Text("No sign-in options"),
               ),
-    };
+            ),
+          ),
+          side: .ttb,
+        ),
+      ),
+    );
   }
 }
