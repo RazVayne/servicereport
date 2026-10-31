@@ -112,6 +112,7 @@ class FDialogBody extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   DefaultTextStyle.merge(
                     style: style.bodyTextStyle,

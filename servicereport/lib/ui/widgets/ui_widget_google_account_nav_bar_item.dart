@@ -14,8 +14,7 @@ class UiWidgetGoogleAccountNavBarItem extends StatelessWidget {
     return FBottomNavigationBarItem(
       icon: GoogleUserCircleAvatar(
         identity: googleIdentity,
-        placeholderPhotoUrl:
-            "https://lh3.googleusercontent.com/a/ACg8ocJESfXD-V2gobGtSM8sRUCn6RpZ8Y7ZeE0EJXMw4zAorx4IXUDb=c-s40",
+        placeholderPhotoUrl: googleIdentity.photoUrl,
       ),
       label: Text(googleIdentity.displayName ?? ''),
     );

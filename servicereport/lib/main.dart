@@ -3,16 +3,23 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:servicereport/signals/signal_connectivity_plus.dart';
 import 'package:servicereport/signals/signal_google_sign_in.dart';
 import 'package:servicereport/ui/permanent/ui_perm_bottom_nav_bar.dart';
 import 'package:servicereport/ui/routes/ui_route_home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
+late final SharedPreferencesWithCache sharedPrefs;
 final signalGoogleSignIn = SignalGoogleSignIn();
+final signalConnectivityPlus = SignalConnectivityPlus();
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-
+  sharedPrefs = await SharedPreferencesWithCache.create(
+    cacheOptions: const SharedPreferencesWithCacheOptions(),
+  );
+  await signalConnectivityPlus.initConnection();
   //FLUTTER NATIVE SPLASH
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   //FLUTTER NATIVE SPLASH

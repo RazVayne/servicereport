@@ -26,7 +26,7 @@ class SignalGoogleSignIn {
       _isInitialized = true;
       await signIn
           .initialize(
-            clientId: kIsWeb ? webCliendId : androidClientId,
+            clientId: kIsWeb ? webServerCliendId : androidClientId,
             serverClientId: kIsWeb ? null : webServerCliendId,
           )
           .then((value) async {
@@ -53,6 +53,7 @@ class SignalGoogleSignIn {
         .authorizationForScopes(scopes);
 
     currentUser.value = user;
+
     isAuthorized.value = authorization != null;
     errorMessage.value = '';
   }
@@ -75,8 +76,16 @@ class SignalGoogleSignIn {
       errorMessage.value = '';
 
       //TODO: Get JSON files from Drive
-    } on GoogleSignInException catch (e) {
-      errorMessage.value = _errorMessageFromSignInException(e);
+    } catch (e) {
+      isAuthorized.value = false;
+
+      if (e == GoogleSignInException) {
+        errorMessage.value = _errorMessageFromSignInException(
+          e as GoogleSignInException,
+        );
+      } else {
+        errorMessage.value = e.toString();
+      }
     }
   }
 
