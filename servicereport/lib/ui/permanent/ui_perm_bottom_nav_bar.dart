@@ -51,8 +51,9 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
         ),
         SignalEffect(
           effect: (context) async {
-            if (context.mounted &&
-                signalGoogleSignIn.currentUser.value != null) {
+            final user = signalGoogleSignIn.currentUser.value;
+            final isAuthorized = signalGoogleSignIn.isAuthorized.value;
+            if (context.mounted && user != null && !isAuthorized) {
               showAuthorizationDialog(context);
             }
           },
@@ -61,9 +62,7 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
               return signalGoogleSignIn.initGoogleSignIn.value.map(
                 data: (isInit) =>
                     switch (signalGoogleSignIn.currentUser.value) {
-                      null => UiWidgetNoAccountNavBarItem(
-                        errorMessage: signalGoogleSignIn.errorMessage.value,
-                      ),
+                      null => UiWidgetNoAccountNavBarItem(),
                       final user => UiWidgetGoogleAccountNavBarItem(
                         googleIdentity: user,
                       ),
@@ -72,7 +71,8 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
                   icon: Icon(FLucideIcons.userX),
                   label: Text("Sign-in init error"),
                 ),
-                loading: () => FProgress(),
+                loading: () =>
+                    FBottomNavigationBarItem(icon: FCircularProgress()),
               );
             },
           ),
@@ -81,14 +81,20 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
     ).animate(autoPlay: true).moveY(begin: 100, end: 0);
   }
 
-  void showAuthorizationDialog(BuildContext context) {
-    showFDialog(
+  bool dialogShown = false;
+  void showAuthorizationDialog(BuildContext context) async {
+    if (dialogShown) return;
+    dialogShown = true;
+
+    await showFDialog(
       context: context,
       builder: (context, style, animation) => FDialog.adaptive(
         horizontalBuilder: (context, style) => FDialogBody(style: style),
         verticalBuilder: (context, style) => FDialogBody(style: style),
       ),
     );
+
+    dialogShown = false;
   }
 }
 
@@ -133,7 +139,6 @@ class FDialogBody extends StatelessWidget {
                                     rootNavigator: true,
                                   ).pop();
                                 }
-                                ;
                               }
                             });
                       }

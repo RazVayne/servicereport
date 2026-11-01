@@ -16,13 +16,14 @@ final signalConnectivityPlus = SignalConnectivityPlus();
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  //FLUTTER NATIVE SPLASH
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  //FLUTTER NATIVE SPLASH
+
   sharedPrefs = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
   await signalConnectivityPlus.initConnection();
-  //FLUTTER NATIVE SPLASH
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  //FLUTTER NATIVE SPLASH
 
   runApp(const MainApp());
 }
@@ -50,6 +51,16 @@ class MainApp extends StatelessWidget {
                 GoRoute(path: '/', builder: (context, state) => UiRouteHome()),
               ],
             ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(path: '/', builder: (context, state) => UiRouteHome()),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(path: '/', builder: (context, state) => UiRouteHome()),
+              ],
+            ),
           ],
         ),
       ],
@@ -65,6 +76,7 @@ class MainApp extends StatelessWidget {
         : (FTheme.neutral.light.desktop, FTheme.neutral.dark.desktop);
 
     return MaterialApp.router(
+      title: 'ServiceReport',
       theme: lightTheme.toApproximateMaterialTheme(),
       darkTheme: darkTheme.toApproximateMaterialTheme(),
       builder: (context, child) => FTheme(

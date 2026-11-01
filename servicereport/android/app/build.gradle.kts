@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
+    id("org.jetbrains.kotlin.android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -15,10 +15,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.servicereport"
@@ -30,12 +26,42 @@ android {
         versionName = flutter.versionName
     }
 
+    flavorDimensions += "default"
+
+    buildFeatures {
+        resValues = true
+    }
+
+    productFlavors {
+        create("staging") {
+            dimension = "default"
+            applicationIdSuffix = ".staging"
+            resValue("string", "app_name", "ServiceReport (Staging)")
+        }
+        create("profiling") {
+            dimension = "default"
+            applicationIdSuffix = ".profiling"
+            resValue("string", "app_name", "ServiceReport (Profiling)")
+        }
+        create("production") {
+            dimension = "default"
+            // No suffix for production
+            resValue("string", "app_name", "ServiceReport")
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 

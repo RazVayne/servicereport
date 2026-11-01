@@ -8,9 +8,11 @@ class SignalGoogleSignIn {
   String webCliendId = "401661839059-752arpga3giqvlt4d20fg06t422flh1n";
   String webServerCliendId =
       "401661839059-752arpga3giqvlt4d20fg06t422flh1n.apps.googleusercontent.com";
+
   String androidClientId = "401661839059-t72i74e0d547q68a06s59g9e0m76kgg3";
   String androidServerClientId =
       "401661839059-mhvhvh06t2cuu7qik8ocpm2n1fp2fdtr.apps.googleusercontent.com";
+
   List<String> scopes = <String>['https://www.googleapis.com/auth/drive.file'];
 
   final currentUser = signal<GoogleSignInAccount?>(null);
@@ -26,8 +28,8 @@ class SignalGoogleSignIn {
       _isInitialized = true;
       await signIn
           .initialize(
-            clientId: kIsWeb ? webServerCliendId : androidClientId,
-            serverClientId: kIsWeb ? null : webServerCliendId,
+            clientId: kIsWeb ? webServerCliendId : null,
+            serverClientId: webServerCliendId,
           )
           .then((value) async {
             signIn.authenticationEvents
@@ -52,10 +54,11 @@ class SignalGoogleSignIn {
         ?.authorizationClient
         .authorizationForScopes(scopes);
 
-    currentUser.value = user;
-
-    isAuthorized.value = authorization != null;
-    errorMessage.value = '';
+    batch(() {
+      currentUser.value = user;
+      isAuthorized.value = authorization != null;
+      errorMessage.value = '';
+    });
   }
 
   Future<void> _handleAuthenticationError(Object e) async {
@@ -64,6 +67,14 @@ class SignalGoogleSignIn {
     errorMessage.value = e is GoogleSignInException
         ? _errorMessageFromSignInException(e)
         : "Unknown exception: $e";
+  }
+
+  Future<void> handleAndroidAuthentication() async {
+    try {
+      await GoogleSignIn.instance.authenticate();
+    } catch (e) {
+      errorMessage.value = e.toString();
+    }
   }
 
   Future<void> handleAuthorizationScopes(GoogleSignInAccount user) async {
@@ -79,10 +90,8 @@ class SignalGoogleSignIn {
     } catch (e) {
       isAuthorized.value = false;
 
-      if (e == GoogleSignInException) {
-        errorMessage.value = _errorMessageFromSignInException(
-          e as GoogleSignInException,
-        );
+      if (e is GoogleSignInException) {
+        errorMessage.value = _errorMessageFromSignInException(e);
       } else {
         errorMessage.value = e.toString();
       }

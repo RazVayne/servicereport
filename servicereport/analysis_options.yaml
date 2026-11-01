@@ -1,3 +1,6 @@
+plugins:
+    signals_lint: ^7.0.0
+
 analyzer:
   exclude:
     - build/**
@@ -7,6 +10,5 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
-  plugins:
-    - signals_lint
+ 
 include: package:flutter_lints/flutter.yaml
