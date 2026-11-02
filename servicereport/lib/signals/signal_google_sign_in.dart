@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:servicereport/main.dart';
 import 'package:signals/signals.dart';
 
 class SignalGoogleSignIn {
@@ -23,24 +24,34 @@ class SignalGoogleSignIn {
   bool _isInitialized = false;
 
   //TODO: Add connectivity checks, test Android flow
-  late final initGoogleSignIn = futureSignal<bool>(() async {
-    if (!_isInitialized) {
-      _isInitialized = true;
-      await signIn
-          .initialize(
-            clientId: kIsWeb ? webServerCliendId : null,
-            serverClientId: webServerCliendId,
-          )
-          .then((value) async {
-            signIn.authenticationEvents
-                .listen(_handleAuthenticationEvent)
-                .onError(_handleAuthenticationError);
-            await signIn.attemptLightweightAuthentication();
-          });
-    }
+  late final initGoogleSignIn = futureSignal<bool>(
+    () async {
+      if (!_isInitialized & signalConnectivityPlus.isConnected.value) {
+        _isInitialized = true;
+        await signIn
+            .initialize(
+              clientId: kIsWeb ? webServerCliendId : null,
+              serverClientId: webServerCliendId,
+            )
+            .then((value) async {
+              signIn.authenticationEvents
+                  .listen(_handleAuthenticationEvent)
+                  .onError(_handleAuthenticationError);
+              await signIn.attemptLightweightAuthentication();
+            });
+      }
 
-    return _isInitialized;
-  });
+      if (_isInitialized &
+          (currentUser.value == null) &
+          signalConnectivityPlus.isConnected.value) {
+        await signIn.attemptLightweightAuthentication();
+      }
+      return _isInitialized;
+    },
+    options: AsyncSignalOptions(
+      dependencies: [signalConnectivityPlus.isConnected],
+    ),
+  );
 
   Future<void> _handleAuthenticationEvent(
     GoogleSignInAuthenticationEvent event,
