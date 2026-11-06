@@ -34,14 +34,20 @@ final router = GoRouter(
   navigatorKey: rootNavigatorKey,
   routes: [
     StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return FScaffold(
-          footer: UiPermBottomNavBar(statefulNavigationShell: navigationShell),
-          child: navigationShell,
+      restorationScopeId: 'router',
+      pageBuilder: (context, state, navigationShell) {
+        return MaterialPage(
+          child: FScaffold(
+            footer: UiPermBottomNavBar(
+              statefulNavigationShell: navigationShell,
+            ),
+            child: navigationShell,
+          ),
         );
       },
       branches: [
         StatefulShellBranch(
+          restorationScopeId: 'homeRoute',
           routes: [
             GoRoute(path: '/', builder: (context, state) => UiRouteHome()),
           ],
