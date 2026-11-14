@@ -23,7 +23,6 @@ class SignalGoogleSignIn {
   final GoogleSignIn signIn = GoogleSignIn.instance;
   bool _isInitialized = false;
 
-  //TODO: Add connectivity checks, test Android flow
   late final initGoogleSignIn = futureSignal<bool>(
     () async {
       if (!_isInitialized & signalConnectivityPlus.isConnected.value) {
@@ -31,7 +30,7 @@ class SignalGoogleSignIn {
         await signIn
             .initialize(
               clientId: kIsWeb ? webServerCliendId : null,
-              serverClientId: webServerCliendId,
+              serverClientId: kIsWeb ? null : webServerCliendId,
             )
             .then((value) async {
               signIn.authenticationEvents

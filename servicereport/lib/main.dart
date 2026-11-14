@@ -5,6 +5,7 @@ import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:servicereport/signals/signal_connectivity_plus.dart';
 import 'package:servicereport/signals/signal_google_sign_in.dart';
+import 'package:servicereport/signals/signal_sqflite.dart';
 import 'package:servicereport/ui/permanent/ui_perm_bottom_nav_bar.dart';
 import 'package:servicereport/ui/routes/ui_route_home.dart';
 import 'package:servicereport/ui/routes/ui_route_no_connection.dart';
@@ -15,6 +16,7 @@ late final SharedPreferencesWithCache sharedPrefs;
 
 final signalConnectivityPlus = SignalConnectivityPlus();
 final signalGoogleSignIn = SignalGoogleSignIn();
+final signalSqflite = SignalSqflite();
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +28,7 @@ Future<void> main() async {
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
   await signalConnectivityPlus.initConnection();
+  await signalSqflite.initSqflite();
 
   runApp(const MainApp());
 }

@@ -31,6 +31,7 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    bool errorToastShown = false;
     return FBottomNavigationBar(
       index: widget.statefulNavigationShell.currentIndex,
       onChange: (currentIndex) {
@@ -67,10 +68,25 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
                         googleIdentity: user,
                       ),
                     },
-                error: (err, stack) => FBottomNavigationBarItem(
-                  icon: Icon(FLucideIcons.userX),
-                  label: Text("Sign-in init error"),
-                ),
+                error: (err, stack) {
+                  if (context.mounted & !errorToastShown) {
+                    errorToastShown = true;
+                    showFToast(
+                      context: context,
+                      title: const Text('Google Sign-in error'),
+                      description: Text(err.toString()),
+                    );
+                  }
+                  return FBottomNavigationBarItem(
+                    icon: FButton.icon(
+                      onPress: () {
+                        signalGoogleSignIn.initGoogleSignIn.refresh();
+                      },
+                      child: const Icon(FLucideIcons.userX),
+                    ),
+                    label: Text("Sign-in init error"),
+                  );
+                },
                 loading: () =>
                     FBottomNavigationBarItem(icon: FCircularProgress()),
               );

@@ -5,7 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:servicereport/main.dart';
 import 'package:signals/signals_flutter.dart';
 import 'google_sign_in_web/google_web_button_stub.dart'
-    if (dart.library.js_interop) 'google_web_button.dart';
+    if (dart.library.js_interop) 'google_sign_in_web/google_web_button.dart';
 
 class UiWidgetNoAccountNavBarItem extends StatelessWidget {
   const UiWidgetNoAccountNavBarItem({super.key});
