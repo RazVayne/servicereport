@@ -1,7 +1,7 @@
+import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart' hide Effect;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:forui/forui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:servicereport/main.dart';
 import 'package:servicereport/ui/widgets/ui_widget_google_account_nav_bar_item.dart';
@@ -84,7 +84,7 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
                       },
                       child: const Icon(FLucideIcons.userX),
                     ),
-                    label: Text("Sign-in init error"),
+                    label: const Text("Sign-in init error"),
                   );
                 },
                 loading: () =>

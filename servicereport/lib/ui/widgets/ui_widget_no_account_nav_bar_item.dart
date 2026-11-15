@@ -82,7 +82,6 @@ class UiWidgetNoAccountNavBarItem extends StatelessWidget {
           side: .ttb,
           useRootNavigator: true,
           useSafeArea: true,
-          resizeToAvoidBottomInset: true,
         ),
       ),
     );

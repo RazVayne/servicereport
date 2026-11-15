@@ -95,8 +95,6 @@ class SignalGoogleSignIn {
       authorization;
       isAuthorized.value = true;
       errorMessage.value = '';
-
-      //TODO: Get JSON files from Drive
     } catch (e) {
       isAuthorized.value = false;
 
