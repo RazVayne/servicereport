@@ -32,6 +32,8 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     bool errorToastShown = false;
+    bool loggedInToastShown = false;
+
     return FBottomNavigationBar(
       index: widget.statefulNavigationShell.currentIndex,
       onChange: (currentIndex) {
@@ -53,6 +55,14 @@ class _UiPermBottomNavBarState extends State<UiPermBottomNavBar> {
         SignalEffect(
           effect: (context) async {
             final user = signalGoogleSignIn.currentUser.value;
+            if (context.mounted && user != null && !loggedInToastShown) {
+              loggedInToastShown = true;
+              showFToast(
+                context: context,
+                title: Text('User ${user.displayName} logged in.'),
+              );
+            }
+
             final isAuthorized = signalGoogleSignIn.isAuthorized.value;
             if (context.mounted && user != null && !isAuthorized) {
               showAuthorizationDialog(context);

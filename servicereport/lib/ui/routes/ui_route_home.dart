@@ -9,43 +9,57 @@ class UiRouteHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          expandedHeight: 150.0,
-          flexibleSpace: FlexibleSpaceBar(
-            title: SignalBuilder(
-              builder: (context) => FHeader(
-                title: Text(
-                  signalSqflite.unpayedReportsCount.value == 0
-                      ? "No due services."
-                      : "${signalSqflite.unpayedReportsCount.value} unpayed services.",
-                ),
-                suffixes: [
-                  FHeaderAction(
-                    icon: const Icon(FLucideIcons.plus),
-                    onPress: () {},
+    return NestedScrollView(
+      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+        return [
+          SliverAppBar(
+            expandedHeight: 150.0,
+            flexibleSpace: FlexibleSpaceBar(
+              title: SignalBuilder(
+                builder: (context) => FHeader(
+                  title: Text(
+                    signalSqflite.unpayedReportsCount.value == 0
+                        ? "No due services."
+                        : "${signalSqflite.unpayedReportsCount.value} unpayed services.",
                   ),
-                ],
+                  suffixes: [
+                    FHeaderAction(
+                      icon: const Icon(FLucideIcons.plus),
+                      onPress: () {},
+                    ),
+                  ],
+                ),
               ),
-            ),
-            background: Image.asset(
-              "assets/cover/sliverappbar_cover.jpg",
-              fit: BoxFit.cover,
+              background: Image.asset(
+                "assets/cover/sliverappbar_cover.jpg",
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-        ),
-        SliverList.builder(
-          itemCount: signalSqflite.reportsList.value.length,
-          itemBuilder: (BuildContext context, int index) {
-            return SignalBuilder(
-              builder: (context) => UiWidgetCardHomeReport(
-                report: signalSqflite.reportsList[index],
-              ),
-            );
+        ];
+      },
+      body: SignalBuilder(
+        builder: (context) => signalSqflite.reportsListFuture.value.map(
+          data: (reportsList) {
+            return reportsList.isNotEmpty
+                ? UiWidgetCardHomeReport(report: reportsList.first)
+                : Center(child: const Icon(FLucideIcons.ghost));
           },
+          error: (err, stack) => Center(
+            child: FTile(
+              prefix: const Icon(FLucideIcons.bug),
+              title: Text(err.toString()),
+              suffix: FButton.icon(
+                child: const Icon(FLucideIcons.rotateCcw),
+                onPress: () {
+                  signalSqflite.reportsListFuture.reload();
+                },
+              ),
+            ),
+          ),
+          loading: () => Center(child: FCircularProgress()),
         ),
-      ],
+      ),
     );
   }
 }

@@ -19,12 +19,7 @@ const String priceColumn = 'price';
 const String payedColumn = 'payed';
 
 class SignalSqflite {
-  late Database database;
-  late var databaseReportsList = <Map<String, Object?>>[];
-  var reportsList = listSignal<ClassReport>([]);
-  var unpayedReportsCount = signal(0);
-
-  Future<void> initSqflite() async {
+  var database = futureSignal<Database>(() async {
     if (kIsWeb) {
       databaseFactory = databaseFactoryFfiWeb;
     } else if (defaultTargetPlatform == TargetPlatform.windows ||
@@ -38,7 +33,7 @@ class SignalSqflite {
 
     var path = join(await getDatabasesPath(), databaseName);
 
-    database = await openDatabase(
+    return await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
@@ -46,20 +41,19 @@ class SignalSqflite {
           'CREATE TABLE $tableName ($idColumn INTEGER PRIMARY KEY AUTOINCREMENT, $dateColumn TEXT NOT NULL, $locationColumn TEXT NOT NULL, $descriptionColumn TEXT NOT NULL, $durationColumn INT NOT NULL, $priceColumn INT NOT NULL, $payedColumn INT NOT NULL)',
         );
       },
-      onOpen: (db) async {
-        getReports(db);
-      },
     );
-  }
+  });
 
-  Future<void> getReports(Database? db) async {
+  late var databaseReportsList = <Map<String, Object?>>[];
+  late var reportsListFuture = futureSignal<List<ClassReport>>(() async {
+    return getReports();
+  }, options: AsyncSignalOptions(dependencies: [database]));
+
+  var reportsList = listSignal<ClassReport>([]);
+  var unpayedReportsCount = signal(0);
+
+  Future<List<ClassReport>> getReports() async {
     databaseReportsList.clear();
-
-    if (db != null) {
-      databaseReportsList = await db.query(tableName);
-    } else {
-      databaseReportsList = await database.query(tableName);
-    }
 
     reportsList.clear();
     if (databaseReportsList.isNotEmpty) {
@@ -76,10 +70,12 @@ class SignalSqflite {
         }
       }
     }
+
+    return reportsList;
   }
 
   Future<int> deleteReport(ClassReport report) async {
-    return await database.delete(
+    return await database.value.value!.delete(
       tableName,
       where: '$idColumn = ?',
       whereArgs: [report.id],
@@ -87,11 +83,11 @@ class SignalSqflite {
   }
 
   Future<int> insertReport(ClassReport report) async {
-    return await database.insert(tableName, report.toMap());
+    return await database.value.value!.insert(tableName, report.toMap());
   }
 
   Future<int> updateReport(ClassReport report) async {
-    return await database.update(
+    return await database.value.value!.update(
       tableName,
       report.toMap(),
       where: '$idColumn = ?',

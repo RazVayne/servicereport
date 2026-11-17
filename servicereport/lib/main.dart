@@ -28,7 +28,6 @@ Future<void> main() async {
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
   await signalConnectivityPlus.initConnection();
-  await signalSqflite.initSqflite();
 
   runApp(const MainApp());
 }
