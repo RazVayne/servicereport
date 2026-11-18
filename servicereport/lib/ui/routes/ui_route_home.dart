@@ -1,4 +1,5 @@
 import 'package:forui/forui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:servicereport/main.dart';
 import 'package:servicereport/ui/widgets/ui_widget_card_home_report.dart';
@@ -25,7 +26,9 @@ class UiRouteHome extends StatelessWidget {
                   suffixes: [
                     FHeaderAction(
                       icon: const Icon(FLucideIcons.plus),
-                      onPress: () {},
+                      onPress: () {
+                        context.push('/add_service_report');
+                      },
                     ),
                   ],
                 ),
@@ -52,7 +55,7 @@ class UiRouteHome extends StatelessWidget {
               suffix: FButton.icon(
                 child: const Icon(FLucideIcons.rotateCcw),
                 onPress: () {
-                  signalSqflite.reportsListFuture.reload();
+                  signalSqflite.reportsListFuture.refresh();
                 },
               ),
             ),

@@ -7,6 +7,7 @@ import 'package:servicereport/signals/signal_connectivity_plus.dart';
 import 'package:servicereport/signals/signal_google_sign_in.dart';
 import 'package:servicereport/signals/signal_sqflite.dart';
 import 'package:servicereport/ui/permanent/ui_perm_bottom_nav_bar.dart';
+import 'package:servicereport/ui/routes/ui_route_form_add_report.dart';
 import 'package:servicereport/ui/routes/ui_route_home.dart';
 import 'package:servicereport/ui/routes/ui_route_no_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,6 +53,10 @@ final router = GoRouter(
           restorationScopeId: 'homeRoute',
           routes: [
             GoRoute(path: '/', builder: (context, state) => UiRouteHome()),
+            GoRoute(
+              path: '/add_service_report',
+              builder: (context, state) => UiRouteFormAddReport(),
+            ),
           ],
         ),
         StatefulShellBranch(

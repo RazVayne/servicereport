@@ -46,7 +46,7 @@ class SignalSqflite {
 
   late var databaseReportsList = <Map<String, Object?>>[];
   late var reportsListFuture = futureSignal<List<ClassReport>>(() async {
-    return getReports();
+    return await getReports();
   }, options: AsyncSignalOptions(dependencies: [database]));
 
   var reportsList = listSignal<ClassReport>([]);
@@ -54,6 +54,9 @@ class SignalSqflite {
 
   Future<List<ClassReport>> getReports() async {
     databaseReportsList.clear();
+    if (database.value.value != null) {
+      databaseReportsList = await database.value.value!.query(tableName);
+    }
 
     reportsList.clear();
     if (databaseReportsList.isNotEmpty) {
